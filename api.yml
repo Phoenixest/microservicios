@@ -1,0 +1,267 @@
+#Test with: http://editor.swagger.io/
+
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Microservicio para el foro
+  description: Go + MongoDB
+  license:
+    name: Arquitectura de Software 2018-III
+host: 192.168.99.102:3000
+basePath: /foro
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /categorias:
+    get:
+      summary: Retorna todas las Categorias
+      operationId: GetCategorias
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CategoriasList'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  /temas:
+    post:
+      summary: Crea un nuevo tema
+      operationId: CreateTema
+      parameters:
+        - name: tema
+          in: body
+          required: true
+          description: Objeto Tema
+          schema:
+            $ref: '#/definitions/Tema'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    get:
+      summary: Retorna todos los Temas
+      operationId: GetTemas
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/TemasList'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+            
+  /mensajes:
+    post:
+      summary: Crea un nuevo mensaje
+      operationId: CreateMensaje
+      parameters:
+        - name: mensaje
+          in: body
+          required: true
+          description: Objeto Mensaje
+          schema:
+            $ref: '#/definitions/Mensaje'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    get:
+      summary: Retorna todos los mensajes
+      operationId: GetMensajes
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/MensajesList'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+  /mensajes/ID:
+    get:
+      summary: Retorna el mensaje con el ID dado
+      operationId: GetMensajeByID
+      parameters:
+        - name: ID
+          in: path
+          description: El ID del mensaje a ser retornado
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/Mensaje'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+            description: Not Acceptable (Invalid Params)
+            schema:
+              $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+    delete:
+      summary: Borra el mensaje con el ID dado
+      operationId: DeleteMensaje
+      parameters:
+        - name: ID
+          in: path
+          description: El ID del mensaje que será borrado
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+            description: Not Acceptable (Invalid Params)
+            schema:
+              $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+definitions:
+
+  # Foro
+  Categoria:
+    type: object
+    required:
+      - ID
+    properties:
+      ID:
+        type: integer
+      Nombre:
+        type: string
+      Descripcion:
+        type: string
+      NumMensajes:
+        type: integer
+      NumTemas:
+        type: integer
+
+  Tema:
+    type: object
+    required:
+      - ID
+    properties:
+      ID:
+        type: integer
+      User:
+        type: string
+      Asunto:
+        type: string
+      NumRes:
+        type: integer
+      NumVistas:
+        type: integer
+        
+  Mensaje:
+    type: object
+    required:
+      - ID
+    properties:
+      ID:
+        type: integer
+      User:
+        type: string
+      Contenido:
+        type: string
+      Fecha:
+        type: object
+
+  MensajesList:
+    type: object
+    required:
+      - total
+      - list
+    properties:
+      total:
+        type: number
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/Mensaje'
+          
+  CategoriasList:
+    type: object
+    required:
+      - total
+      - list
+    properties:
+      total:
+        type: number
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/Categoria'
+          
+  TemasList:
+    type: object
+    required:
+      - total
+      - list
+    properties:
+      total:
+        type: number
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/Tema'
+
+# Errors
+  ErrorModel:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      message:
+        type: string
+      code:
+        type: number
+      description:
+        type: object
